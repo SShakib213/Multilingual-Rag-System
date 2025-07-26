@@ -30,8 +30,8 @@ CACHE_DIR = "./models"
 class BanglaRAGChain:
     def __init__(self):
         self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.chat_model_id = "llama3.2:1b"  # Ollama model
-        self.embed_model_id = "nomic-embed-text"  # Ollama embeddings
+        self.chat_model_id = "llama3.2:1b"  
+        self.embed_model_id = "nomic-embed-text" 
         self.k = 3
         self.max_new_tokens = 256
         self.chunk_size = 500
@@ -48,7 +48,7 @@ class BanglaRAGChain:
         self._chain = None
 
     def load_quick(self):
-        """Quick load with Ollama models"""
+      
         rprint(Panel("[bold green]Quick loading Bengali RAG with Ollama...", expand=False))
         
         try:
@@ -63,22 +63,22 @@ class BanglaRAGChain:
             self._get_llm()
             self._create_chain()
             
-            rprint(Panel("[bold green]✅ Bengali RAG with Ollama loaded successfully!", expand=False))
+            rprint(Panel("Bengali RAG with Ollama loaded successfully!", expand=False))
             return True
             
         except Exception as e:
-            rprint(Panel(f"[red]❌ Loading failed: {e}", expand=False))
+            rprint(Panel(f"Loading failed: {e}", expand=False))
             return False
 
     def _create_document(self):
-        """Split Bengali text into chunks"""
+      
         try:
-            rprint(Panel("[bold green]Processing Bengali text...", expand=False))
+            rprint(Panel("Processing Bengali text...", expand=False))
             
             with open(self.text_path, "r", encoding="utf-8") as file:
                 text_content = file.read()
             
-            # Bengali-aware text splitter
+            
             character_splitter = RecursiveCharacterTextSplitter(
                 separators=["\n\n", "\n", "।", ".", "!", "?", " "],
                 chunk_size=self.chunk_size,
@@ -87,10 +87,10 @@ class BanglaRAGChain:
             
             self._documents = character_splitter.split_text(text_content)
             
-            rprint(Panel(f"[bold green]✅ Created {len(self._documents)} chunks", expand=False))
+            rprint(Panel(f"Created {len(self._documents)} chunks", expand=False))
             
         except Exception as e:
-            rprint(Panel(f"[red]Document creation failed: {e}", expand=False))
+            rprint(Panel(f"Document creation failed: {e}", expand=False))
             raise
 
     def _update_chroma_db(self):
@@ -98,7 +98,7 @@ class BanglaRAGChain:
         try:
             rprint(Panel("[bold green]Creating embeddings with Bengali SBERT...", expand=False))
             
-            # Clear existing database to avoid dimension mismatch
+           
             db_path = "chroma_bangla_db"
             if os.path.exists(db_path):
                 rprint(Panel("[bold yellow]Clearing existing database for dimension compatibility...", expand=False))
@@ -111,17 +111,17 @@ class BanglaRAGChain:
                     model_kwargs={"device": self._device},
                     encode_kwargs={"normalize_embeddings": True}
                 )
-                rprint(Panel("[bold green]✅ Using Bengali SBERT embeddings!", expand=False))
+                rprint(Panel("Using Bengali SBERT embeddings!", expand=False))
             except Exception as e:
-                rprint(Panel(f"[yellow]⚠️ Bengali SBERT failed: {e}", expand=False))
-                rprint(Panel("[bold yellow]Falling back to Ollama embeddings...", expand=False))
+                rprint(Panel(f"Bengali SBERT failed: {e}", expand=False))
+                rprint(Panel("Falling back to Ollama embeddings...", expand=False))
                 
                 # Fallback to Ollama embeddings
                 embeddings = OllamaEmbeddings(
                     model=self.embed_model_id,
                     base_url="http://localhost:11434"
                 )
-                rprint(Panel("[bold green]✅ Using Ollama embeddings as fallback!", expand=False))
+                rprint(Panel("Using Ollama embeddings as fallback!", expand=False))
             
             self._db = Chroma.from_texts(
                 texts=self._documents, 
@@ -129,10 +129,10 @@ class BanglaRAGChain:
                 persist_directory=db_path
             )
             
-            rprint(Panel("[bold green]✅ Vector database created!", expand=False))
+            rprint(Panel("Vector database created!", expand=False))
             
         except Exception as e:
-            rprint(Panel(f"[red]Vector DB failed: {e}", expand=False))
+            rprint(Panel(f"Vector DB failed: {e}", expand=False))
             raise
 
     def _get_retriever(self):
@@ -141,12 +141,12 @@ class BanglaRAGChain:
             search_type="similarity", 
             search_kwargs={"k": self.k}
         )
-        rprint(Panel("[bold green]✅ Retriever ready!", expand=False))
+        rprint(Panel("Retriever ready!", expand=False))
 
     def _get_llm(self):
         """Initialize Ollama LLM"""
         try:
-            rprint(Panel("[bold green]Loading Ollama LLM...", expand=False))
+            rprint(Panel("Loading Ollama LLM...", expand=False))
             
             # Try different Ollama models
             models_to_try = [
@@ -172,19 +172,19 @@ class BanglaRAGChain:
                     # Test the model
                     test_response = self._llm("Hello")
                     if test_response:
-                        rprint(Panel(f"[bold green]✅ Using {model_name}!", expand=False))
+                        rprint(Panel(f"Using {model_name}!", expand=False))
                         return
                         
                 except Exception as model_error:
-                    rprint(Panel(f"[yellow]⚠️ {model_name} failed: {model_error}", expand=False))
+                    rprint(Panel(f"{model_name} failed: {model_error}", expand=False))
                     continue
             
             # If all Ollama models fail, fallback to HuggingFace
-            rprint(Panel("[bold yellow]All Ollama models failed, using HuggingFace fallback...", expand=False))
+            rprint(Panel("All Ollama models failed, using HuggingFace fallback...", expand=False))
             self._load_huggingface_fallback()
             
         except Exception as e:
-            rprint(Panel(f"[red]LLM initialization failed: {e}", expand=False))
+            rprint(Panel(f"LLM initialization failed: {e}", expand=False))
             raise
 
     def _load_huggingface_fallback(self):
@@ -225,12 +225,12 @@ class BanglaRAGChain:
         )
         
         self._llm = HuggingFacePipeline(pipeline=pipe)
-        rprint(Panel("[bold green]✅ HuggingFace fallback ready!", expand=False))
+        rprint(Panel("HuggingFace fallback ready!", expand=False))
 
     def _create_chain(self):
         """Create the RAG chain"""
         try:
-            rprint(Panel("[bold green]Creating RAG chain...", expand=False))
+            rprint(Panel("Creating RAG chain...", expand=False))
             
             # Improved Bengali-aware prompt template
             template = """আপনি একজন সহায়ক AI সহায়ক। দেওয়া প্রসঙ্গের ভিত্তিতে প্রশ্নের সংক্ষিপ্ত ও সঠিক উত্তর দিন। যদি প্রসঙ্গে উত্তর না থাকে, তাহলে "আমি জানি না" বলুন।
@@ -246,7 +246,7 @@ class BanglaRAGChain:
                 template=template
             )
             
-            # Create the chain with proper input handling
+           
             def format_docs(docs):
                 if not docs:
                     return "কোন প্রাসঙ্গিক তথ্য পাওয়া যায়নি।"
@@ -262,10 +262,10 @@ class BanglaRAGChain:
                 | StrOutputParser()
             )
             
-            rprint(Panel("[bold green]✅ RAG chain created!", expand=False))
+            rprint(Panel("RAG chain created!", expand=False))
             
         except Exception as e:
-            rprint(Panel(f"[red]Chain creation failed: {e}", expand=False))
+            rprint(Panel(f"Chain creation failed: {e}", expand=False))
             raise
 
     def get_stats(self):
@@ -311,7 +311,7 @@ class BanglaRAGChain:
                     docs = self._retriever.get_relevant_documents(question)
                     context = [doc.page_content for doc in docs]
                 except Exception as e:
-                    rprint(Panel(f"[yellow]Context retrieval warning: {e}", expand=False))
+                    rprint(Panel(f"Context retrieval warning: {e}", expand=False))
                     context = []
             
             return answer, context
@@ -326,16 +326,16 @@ if __name__ == "__main__":
     
     if rag.load_quick():
         print("\n" + "="*50)
-        print("🤖 Bengali RAG System Ready!")
+        print("Bengali RAG System Ready!")
         print("="*50)
         
         # Test query
         query = "বিয়ের সময় কল্যাণীর প্রকৃত বয়স কত ছিল?"
         answer, context = rag.get_response(query)
         
-        print(f"\n📝 প্রশ্ন: {query}")
-        print(f"✅ উত্তর: {answer}")
-        print(f"\n📚 প্রসঙ্গ: {context[:200]}...")
+        print(f"প্রশ্ন: {query}")
+        print(f"উত্তর: {answer}")
+        print(f"প্রসঙ্গ: {context[:200]}...")
 
 
 
