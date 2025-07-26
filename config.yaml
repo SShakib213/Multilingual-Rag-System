@@ -1,0 +1,21 @@
+# RAG Configuration
+chunk_size: 500
+chunk_overlap: 100
+top_k: 1  # Just get the most relevant document
+
+# Model Configuration
+llm_model: "microsoft/DialoGPT-medium"  # Options: "google/flan-t5-base", "microsoft/DialoGPT-medium"
+embeddings_model: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+
+# Vector Store Configuration
+vector_store:
+  persist_directory: "chroma_db"
+  collection_name: "bangla_rag_collection"
+
+# Generation Parameters
+generation:
+  max_length: 256  # Reduced from 512
+  temperature: 0.7
+  do_sample: true
+  top_p: 0.9
+  top_k: 50
