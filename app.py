@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from bangla_rag_improved import BanglaRAGChain  # Use improved version
+from bangla_rag_improved import BanglaRAGChain  
 import uvicorn
 import logging
 import os
@@ -31,18 +31,18 @@ async def startup_event():
     try:
         logger.info("🚀 Initializing improved Bengali RAG system...")
         
-        rag = BanglaRAGChain()  # Use improved class
-        success = rag.load_quick()  # Use quick load method
+        rag = BanglaRAGChain()  
+        success = rag.load_quick() 
         
         if success:
             initialization_time = time.time() - start_time
-            logger.info(f"✅ RAG system initialized successfully in {initialization_time:.2f} seconds")
+            logger.info(f"RAG system initialized successfully in {initialization_time:.2f} seconds")
         else:
-            logger.error("❌ Failed to initialize RAG system")
+            logger.error("Failed to initialize RAG system")
             rag = None
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize RAG system: {e}")
+        logger.error(f"Failed to initialize RAG system: {e}")
         rag = None
 
 class QueryRequest(BaseModel):
@@ -78,7 +78,7 @@ async def root():
         </style>
     </head>
     <body>
-        <h1>🤖 Multilingual RAG System (Local)</h1>
+        <h1>Multilingual RAG System</h1>
         <div class="container">
             <h3>System Status</h3>
             <div id="status" class="status">Checking...</div>
@@ -102,17 +102,17 @@ async def root():
                     if (data.status === 'healthy') {
                         statusDiv.className = 'status ready';
                         statusDiv.innerHTML = `
-                            ✅ System Ready<br>
+                            System Ready<br>
                             Device: ${data.device}<br>
                             Models: ${data.models_loaded ? 'Loaded' : 'Loading...'}<br>
                             Initialization Time: ${data.initialization_time || 'N/A'}s
                         `;
                     } else {
                         statusDiv.className = 'status not-ready';
-                        statusDiv.innerHTML = '❌ System Not Ready - Check logs';
+                        statusDiv.innerHTML = 'System Not Ready - Check logs';
                     }
                 } catch (error) {
-                    document.getElementById('status').innerHTML = '❌ Error checking status';
+                    document.getElementById('status').innerHTML = 'Error checking status';
                 }
             }
 
@@ -212,7 +212,7 @@ async def query_rag_form(question: str = Form(...)):
     return await query_rag(request)
 
 if __name__ == "__main__":
-    print("🚀 Starting Multilingual RAG System with Local Models")
-    print("📦 First run may take time to download models...")
-    print("🌐 Web interface will be available at: http://localhost:8000")
+    print("Starting Multilingual RAG System with Local Models")
+    print("First run may take time to download models...")
+    print("Web interface will be available at: http://localhost:8000")
     uvicorn.run(app, host="0.0.0.0", port=8000)
